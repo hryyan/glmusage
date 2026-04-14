@@ -1,15 +1,13 @@
 .PHONY: build run install clean
 
-BINARY = glmusage
-
 build:
-	go build -o $(BINARY) ./cmd/glmusage/
+	go build -o glmusage ./cmd/glmusage/
 
 run: build
-	./$(BINARY)
+	./glmusage
 
 install:
 	go install ./cmd/glmusage/
 
 clean:
-	rm -f $(BINARY)
+	rm -f glmusage

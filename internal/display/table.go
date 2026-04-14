@@ -5,7 +5,7 @@ import (
 	"math"
 	"strings"
 
-	"glm-tools/internal/api"
+	"github.com/hryyan/glmusage/internal/api"
 )
 
 const (

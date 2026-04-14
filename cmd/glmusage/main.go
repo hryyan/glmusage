@@ -9,10 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"glm-tools/internal/api"
-	"glm-tools/internal/display"
-	"glm-tools/internal/timeutil"
-	"glm-tools/internal/upgrade"
+	"github.com/hryyan/glmusage/internal/api"
+	"github.com/hryyan/glmusage/internal/display"
+	"github.com/hryyan/glmusage/internal/timeutil"
+	"github.com/hryyan/glmusage/internal/upgrade"
 )
 
 // 构建时通过 -ldflags "-X main.version=v0.1.0" 注入
