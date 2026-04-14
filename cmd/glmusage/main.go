@@ -12,9 +12,15 @@ import (
 	"glm-tools/internal/api"
 	"glm-tools/internal/display"
 	"glm-tools/internal/timeutil"
+	"glm-tools/internal/upgrade"
 )
 
+// 构建时通过 -ldflags "-X main.version=v0.1.0" 注入
+var version = "dev"
+
 var (
+	upgradeCmd   = flag.Bool("upgrade", false, "升级到最新版本")
+	versionCmd   = flag.Bool("version", false, "显示版本号")
 	watchFlag    = flag.Bool("watch", false, "持续监控模式")
 	intervalFlag = flag.Int("interval", 60, "watch 模式刷新间隔（秒）")
 	noColorFlag  = flag.Bool("no-color", false, "禁用彩色输出")
@@ -22,6 +28,20 @@ var (
 
 func main() {
 	flag.Parse()
+
+	switch {
+	case *versionCmd:
+		fmt.Printf("glmusage %s\n", version)
+		return
+	case *upgradeCmd:
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		defer cancel()
+		if err := upgrade.DoUpgrade(ctx, version); err != nil {
+			fmt.Fprintf(os.Stderr, "\033[31m%s\033[0m\n", err)
+			os.Exit(1)
+		}
+		return
+	}
 
 	token := os.Getenv("GLM_AUTH_TOKEN")
 	if token == "" {
