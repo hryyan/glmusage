@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -112,6 +113,13 @@ func refresh(client *api.Client, interval int, noColor bool) {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\033[31m%s\033[0m\n", err)
 		return
+	}
+
+	if result.Token5h.Type != "" {
+		home, _ := os.UserHomeDir()
+		if home != "" {
+			_ = os.WriteFile(filepath.Join(home, ".glm_cost"), []byte(fmt.Sprintf("%.0f%%\n", result.Token5h.Percentage)), 0644)
+		}
 	}
 
 	display.Render(result, display.Config{NoColor: noColor})
