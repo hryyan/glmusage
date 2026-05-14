@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -59,8 +60,10 @@ func DoUpgrade(ctx context.Context, currentVersion string) error {
 		return err
 	}
 
-	if currentVersion != "" && release.TagName == currentVersion {
-		fmt.Printf("当前已是最新版本 %s\n", currentVersion)
+	if currentVersion == "dev" {
+		fmt.Println("开发版本，跳过版本检查直接升级")
+	} else if compareVersions(currentVersion, release.TagName) >= 0 {
+		fmt.Printf("当前版本 %s >= 远程版本 %s，无需升级\n", currentVersion, release.TagName)
 		return nil
 	}
 
@@ -106,6 +109,33 @@ func DoUpgrade(ctx context.Context, currentVersion string) error {
 
 	fmt.Printf("已升级到 %s\n", release.TagName)
 	return nil
+}
+
+func compareVersions(v1, v2 string) int {
+	v1 = strings.TrimPrefix(v1, "v")
+	v2 = strings.TrimPrefix(v2, "v")
+	p1 := strings.Split(v1, ".")
+	p2 := strings.Split(v2, ".")
+	maxLen := len(p1)
+	if len(p2) > maxLen {
+		maxLen = len(p2)
+	}
+	for i := 0; i < maxLen; i++ {
+		var n1, n2 int
+		if i < len(p1) {
+			n1, _ = strconv.Atoi(p1[i])
+		}
+		if i < len(p2) {
+			n2, _ = strconv.Atoi(p2[i])
+		}
+		if n1 != n2 {
+			if n1 < n2 {
+				return -1
+			}
+			return 1
+		}
+	}
+	return 0
 }
 
 func findAsset(assets []Asset) *Asset {
